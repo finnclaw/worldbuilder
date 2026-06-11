@@ -6,7 +6,7 @@ A simple wiki generator for fictional worlds. Write markdown files, get a browsa
 
 1. Add entries to `worlds/` using templates from `templates/`
 2. Run `python build.py`
-3. Open `site/index.html`
+3. Open `docs/index.html`
 
 ## Entry Types
 

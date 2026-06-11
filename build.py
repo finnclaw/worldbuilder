@@ -11,7 +11,7 @@ from pathlib import Path
 from datetime import datetime
 
 WORLDS_DIR = Path("worlds")
-SITE_DIR = Path("site")
+SITE_DIR = Path("docs")
 TEMPLATE_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -177,7 +177,7 @@ def build():
     )
     (SITE_DIR / "index.html").write_text(index)
     print(f"  → {SITE_DIR}/index.html")
-    print(f"\nBuilt {len(entries)} entries. Open site/index.html to view.")
+    print(f"\nBuilt {len(entries)} entries. Open docs/index.html to view.")
 
 if __name__ == "__main__":
     build()
