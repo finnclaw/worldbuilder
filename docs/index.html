@@ -8,28 +8,288 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Georgia, serif; background: #1a1a2e; color: #eee; line-height: 1.6; }
         .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
-        header { border-bottom: 1px solid #333; padding-bottom: 1rem; margin-bottom: 2rem; }
+        header { border-bottom: 1px solid #333; padding-bottom: 1rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
         header h1 { color: #ffd700; }
         h2 { color: #ffd700; margin-top: 2rem; margin-bottom: 1rem; }
+
+        .btn { background: #4ecdc4; color: #1a1a2e; border: none; padding: 0.5rem 1rem; cursor: pointer; font-family: inherit; font-size: 1rem; border-radius: 4px; }
+        .btn:hover { background: #ffd700; }
+        .btn-small { padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-left: 0.5rem; }
+        .btn-danger { background: #e74c3c; color: white; }
+
         .entry-list { list-style: none; }
-        .entry-list li { padding: 0.5rem 0; border-bottom: 1px solid #333; }
-        .entry-list a { color: #4ecdc4; text-decoration: none; }
+        .entry-list li { padding: 0.75rem 0; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .entry-list a { color: #4ecdc4; text-decoration: none; font-size: 1.1rem; }
         .entry-list a:hover { color: #ffd700; }
+        .entry-actions { display: flex; gap: 0.25rem; }
+
+        .type-badge { background: #333; padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.75rem; color: #888; margin-left: 0.5rem; }
         .stats { color: #888; margin-top: 2rem; font-size: 0.9rem; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; }
+        .modal.active { display: flex; justify-content: center; align-items: center; }
+        .modal-content { background: #2a2a4e; padding: 2rem; border-radius: 8px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .modal h2 { margin-bottom: 1rem; }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.25rem; color: #888; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.5rem; background: #1a1a2e; border: 1px solid #444; color: #eee; font-family: inherit; font-size: 1rem; border-radius: 4px; }
+        .form-group textarea { min-height: 150px; resize: vertical; }
+        .form-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+
+        /* View entry */
+        .entry-view { display: none; }
+        .entry-view.active { display: block; }
+        .entry-view .meta { color: #888; margin-bottom: 1rem; }
+        .entry-view .meta span { background: #333; padding: 0.2rem 0.5rem; border-radius: 3px; margin-right: 0.5rem; }
+        .entry-view .content { margin-top: 1rem; }
+        .entry-view .content p { margin: 1rem 0; }
+        .back-link { color: #888; text-decoration: none; }
+        .back-link:hover { color: #ffd700; }
+
+        .empty-state { color: #666; font-style: italic; padding: 2rem; text-align: center; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🌍 Worldbuilder</h1>
-        </header>
-        <h2>Planets</h2>
-<ul class='entry-list'><li><a href="zorah-prime.html">Zorah Prime</a></li></ul>
-<h2>Speciess</h2>
-<ul class='entry-list'><li><a href="zorathians.html">Zorathians</a></li></ul>
-        <div class="stats">
-            2 entries | Generated 2026-06-11 01:33
+        <!-- Index View -->
+        <div id="index-view">
+            <header>
+                <h1>🌍 Worldbuilder</h1>
+                <button class="btn" onclick="openCreate()">+ Create Entry</button>
+            </header>
+            <div id="entries-list"></div>
+            <div class="stats" id="stats"></div>
+        </div>
+
+        <!-- Entry View -->
+        <div id="entry-view" class="entry-view">
+            <header>
+                <h1 id="entry-title"></h1>
+                <a href="#" class="back-link" onclick="showIndex(); return false;">← Back to Index</a>
+            </header>
+            <div class="meta" id="entry-meta"></div>
+            <div class="content" id="entry-content"></div>
         </div>
     </div>
+
+    <!-- Create/Edit Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Create Entry</h2>
+            <form id="entry-form">
+                <input type="hidden" id="entry-id">
+                <div class="form-group">
+                    <label>Name *</label>
+                    <input type="text" id="name" required placeholder="e.g., Zorah Prime">
+                </div>
+                <div class="form-group">
+                    <label>Type *</label>
+                    <select id="type" required>
+                        <option value="">Select type...</option>
+                        <option value="planet">Planet</option>
+                        <option value="species">Species</option>
+                        <option value="character">Character</option>
+                        <option value="location">Location</option>
+                        <option value="faction">Faction</option>
+                        <option value="event">Event</option>
+                        <option value="artifact">Artifact</option>
+                        <option value="concept">Concept</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tags (comma separated)</label>
+                    <input type="text" id="tags" placeholder="e.g., hostile, ancient, mysterious">
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea id="description" required placeholder="Describe this entry. You can reference other entries by name and they'll auto-link."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn">Save</button>
+                    <button type="button" class="btn" style="background: #666;" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'worldbuilder_entries';
+
+        function getEntries() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveEntries(entries) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function slugify(text) {
+            return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        }
+
+        function autoLink(text, entries, currentId) {
+            let html = text.replace(/\n/g, '</p><p>');
+            html = '<p>' + html + '</p>';
+
+            entries.forEach(entry => {
+                if (entry.id === currentId) return;
+                const pattern = new RegExp(`\\b${entry.name}\\b`, 'g');
+                html = html.replace(pattern, `<a href="#" onclick="viewEntry('${entry.id}'); return false;">${entry.name}</a>`);
+            });
+
+            return html;
+        }
+
+        function render() {
+            const entries = getEntries();
+            const listEl = document.getElementById('entries-list');
+            const statsEl = document.getElementById('stats');
+
+            if (entries.length === 0) {
+                listEl.innerHTML = '<div class="empty-state">No entries yet. Click "Create Entry" to start building your world!</div>';
+                statsEl.textContent = '';
+                return;
+            }
+
+            // Group by type
+            const byType = {};
+            entries.forEach(e => {
+                if (!byType[e.type]) byType[e.type] = [];
+                byType[e.type].push(e);
+            });
+
+            let html = '';
+            Object.keys(byType).sort().forEach(type => {
+                const items = byType[type].sort((a, b) => a.name.localeCompare(b.name));
+                html += `<h2>${type.charAt(0).toUpperCase() + type.slice(1)}s</h2>`;
+                html += '<ul class="entry-list">';
+                items.forEach(entry => {
+                    html += `
+                        <li>
+                            <span>
+                                <a href="#" onclick="viewEntry('${entry.id}'); return false;">${entry.name}</a>
+                                ${entry.tags ? entry.tags.map(t => `<span class="type-badge">#${t}</span>`).join('') : ''}
+                            </span>
+                            <span class="entry-actions">
+                                <button class="btn btn-small" onclick="editEntry('${entry.id}')">Edit</button>
+                                <button class="btn btn-small btn-danger" onclick="deleteEntry('${entry.id}')">×</button>
+                            </span>
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+            });
+
+            listEl.innerHTML = html;
+            statsEl.textContent = `${entries.length} entries`;
+        }
+
+        function showIndex() {
+            document.getElementById('index-view').style.display = 'block';
+            document.getElementById('entry-view').classList.remove('active');
+            render();
+        }
+
+        function viewEntry(id) {
+            const entries = getEntries();
+            const entry = entries.find(e => e.id === id);
+            if (!entry) return;
+
+            document.getElementById('index-view').style.display = 'none';
+            document.getElementById('entry-view').classList.add('active');
+            document.getElementById('entry-title').textContent = entry.name;
+
+            let meta = `<span>${entry.type}</span>`;
+            if (entry.tags) {
+                entry.tags.forEach(t => meta += `<span>#${t}</span>`);
+            }
+            document.getElementById('entry-meta').innerHTML = meta;
+            document.getElementById('entry-content').innerHTML = autoLink(entry.description, entries, id);
+        }
+
+        function openCreate() {
+            document.getElementById('modal-title').textContent = 'Create Entry';
+            document.getElementById('entry-form').reset();
+            document.getElementById('entry-id').value = '';
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function editEntry(id) {
+            const entries = getEntries();
+            const entry = entries.find(e => e.id === id);
+            if (!entry) return;
+
+            document.getElementById('modal-title').textContent = 'Edit Entry';
+            document.getElementById('entry-id').value = entry.id;
+            document.getElementById('name').value = entry.name;
+            document.getElementById('type').value = entry.type;
+            document.getElementById('tags').value = entry.tags ? entry.tags.join(', ') : '';
+            document.getElementById('description').value = entry.description;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function deleteEntry(id) {
+            if (!confirm('Delete this entry?')) return;
+            let entries = getEntries();
+            entries = entries.filter(e => e.id !== id);
+            saveEntries(entries);
+            render();
+        }
+
+        document.getElementById('entry-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('entry-id').value;
+            const name = document.getElementById('name').value.trim();
+            const type = document.getElementById('type').value;
+            const tagsStr = document.getElementById('tags').value.trim();
+            const description = document.getElementById('description').value.trim();
+
+            const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
+
+            let entries = getEntries();
+
+            if (id) {
+                // Edit
+                const idx = entries.findIndex(e => e.id === id);
+                if (idx !== -1) {
+                    entries[idx] = { ...entries[idx], name, type, tags, description, updated: new Date().toISOString() };
+                }
+            } else {
+                // Create
+                entries.push({
+                    id: generateId(),
+                    name,
+                    type,
+                    tags,
+                    description,
+                    created: new Date().toISOString()
+                });
+            }
+
+            saveEntries(entries);
+            closeModal();
+            render();
+        });
+
+        // Close modal on outside click
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // Initial render
+        render();
+    </script>
 </body>
 </html>
