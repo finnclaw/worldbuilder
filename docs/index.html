@@ -7,15 +7,17 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Georgia, serif; background: #1a1a2e; color: #eee; line-height: 1.6; }
-        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
         header { border-bottom: 1px solid #333; padding-bottom: 1rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
         header h1 { color: #ffd700; }
         h2 { color: #ffd700; margin-top: 2rem; margin-bottom: 1rem; }
+        h3 { color: #4ecdc4; margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1rem; }
 
         .btn { background: #4ecdc4; color: #1a1a2e; border: none; padding: 0.5rem 1rem; cursor: pointer; font-family: inherit; font-size: 1rem; border-radius: 4px; }
         .btn:hover { background: #ffd700; }
         .btn-small { padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-left: 0.5rem; }
         .btn-danger { background: #e74c3c; color: white; }
+        .btn-secondary { background: #666; }
 
         .entry-list { list-style: none; }
         .entry-list li { padding: 0.75rem 0; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
@@ -26,17 +28,28 @@
         .type-badge { background: #333; padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.75rem; color: #888; margin-left: 0.5rem; }
         .stats { color: #888; margin-top: 2rem; font-size: 0.9rem; }
 
+        /* Warnings */
+        .warnings { background: #3d2020; border: 1px solid #e74c3c; padding: 1rem; border-radius: 6px; margin-bottom: 2rem; }
+        .warnings h3 { color: #e74c3c; margin: 0 0 0.5rem 0; }
+        .warnings ul { margin-left: 1.5rem; }
+        .warnings li { color: #ffaaaa; margin: 0.25rem 0; }
+        .warning-link { color: #ff6b6b; }
+
         /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; }
-        .modal.active { display: flex; justify-content: center; align-items: center; }
-        .modal-content { background: #2a2a4e; padding: 2rem; border-radius: 8px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; overflow-y: auto; }
+        .modal.active { display: flex; justify-content: center; align-items: flex-start; padding: 2rem 0; }
+        .modal-content { background: #2a2a4e; padding: 2rem; border-radius: 8px; width: 90%; max-width: 700px; margin: auto; }
         .modal h2 { margin-bottom: 1rem; }
 
         .form-group { margin-bottom: 1rem; }
         .form-group label { display: block; margin-bottom: 0.25rem; color: #888; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.5rem; background: #1a1a2e; border: 1px solid #444; color: #eee; font-family: inherit; font-size: 1rem; border-radius: 4px; }
-        .form-group textarea { min-height: 150px; resize: vertical; }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .form-group textarea.large { min-height: 150px; }
         .form-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+
+        .field-section { border: 1px solid #444; padding: 1rem; border-radius: 6px; margin-top: 1rem; background: #222244; }
+        .field-section h3 { margin-top: 0; color: #ffd700; }
 
         /* View entry */
         .entry-view { display: none; }
@@ -45,10 +58,18 @@
         .entry-view .meta span { background: #333; padding: 0.2rem 0.5rem; border-radius: 3px; margin-right: 0.5rem; }
         .entry-view .content { margin-top: 1rem; }
         .entry-view .content p { margin: 1rem 0; }
+        .entry-view .field { margin: 1rem 0; padding: 1rem; background: #222244; border-radius: 6px; }
+        .entry-view .field-label { color: #888; font-size: 0.85rem; margin-bottom: 0.25rem; }
+        .entry-view .field-value { color: #eee; }
         .back-link { color: #888; text-decoration: none; }
         .back-link:hover { color: #ffd700; }
 
         .empty-state { color: #666; font-style: italic; padding: 2rem; text-align: center; }
+
+        a.auto-link { color: #4ecdc4; text-decoration: none; }
+        a.auto-link:hover { color: #ffd700; text-decoration: underline; }
+
+        .broken-link { color: #e74c3c; border-bottom: 1px dashed #e74c3c; }
     </style>
 </head>
 <body>
@@ -59,6 +80,7 @@
                 <h1>🌍 Worldbuilder</h1>
                 <button class="btn" onclick="openCreate()">+ Create Entry</button>
             </header>
+            <div id="warnings"></div>
             <div id="entries-list"></div>
             <div class="stats" id="stats"></div>
         </div>
@@ -80,35 +102,38 @@
             <h2 id="modal-title">Create Entry</h2>
             <form id="entry-form">
                 <input type="hidden" id="entry-id">
+
+                <div class="form-group">
+                    <label>Type *</label>
+                    <select id="type" required onchange="updateFormFields()">
+                        <option value="">Select type...</option>
+                        <option value="planet">🪐 Planet</option>
+                        <option value="species">👽 Species</option>
+                        <option value="character">👤 Character</option>
+                        <option value="location">📍 Location</option>
+                        <option value="faction">⚔️ Faction</option>
+                        <option value="event">📅 Event</option>
+                        <option value="artifact">🔮 Artifact</option>
+                        <option value="concept">💡 Concept</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label>Name *</label>
                     <input type="text" id="name" required placeholder="e.g., Zorah Prime">
                 </div>
-                <div class="form-group">
-                    <label>Type *</label>
-                    <select id="type" required>
-                        <option value="">Select type...</option>
-                        <option value="planet">Planet</option>
-                        <option value="species">Species</option>
-                        <option value="character">Character</option>
-                        <option value="location">Location</option>
-                        <option value="faction">Faction</option>
-                        <option value="event">Event</option>
-                        <option value="artifact">Artifact</option>
-                        <option value="concept">Concept</option>
-                    </select>
-                </div>
+
+                <!-- Type-specific fields container -->
+                <div id="type-fields"></div>
+
                 <div class="form-group">
                     <label>Tags (comma separated)</label>
                     <input type="text" id="tags" placeholder="e.g., hostile, ancient, mysterious">
                 </div>
-                <div class="form-group">
-                    <label>Description *</label>
-                    <textarea id="description" required placeholder="Describe this entry. You can reference other entries by name and they'll auto-link."></textarea>
-                </div>
+
                 <div class="form-actions">
                     <button type="submit" class="btn">Save</button>
-                    <button type="button" class="btn" style="background: #666;" onclick="closeModal()">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 </div>
             </form>
         </div>
@@ -116,6 +141,78 @@
 
     <script>
         const STORAGE_KEY = 'worldbuilder_entries';
+
+        // Type-specific templates
+        const TYPE_TEMPLATES = {
+            planet: {
+                fields: [
+                    { name: 'climate', label: 'Climate', type: 'text', placeholder: 'e.g., Arid deserts, polar ice caps, tropical storms' },
+                    { name: 'inhabitants', label: 'Inhabitants', type: 'textarea', placeholder: 'Who or what lives here? Reference species by name to auto-link.' },
+                    { name: 'history', label: 'History', type: 'textarea', placeholder: 'Major historical events, how this world came to be', large: true },
+                    { name: 'description', label: 'Additional Notes', type: 'textarea', placeholder: 'Any other details about this planet' }
+                ]
+            },
+            species: {
+                fields: [
+                    { name: 'homeworld', label: 'Homeworld', type: 'text', placeholder: 'Name of their home planet (will auto-link if it exists)' },
+                    { name: 'biology', label: 'Biology', type: 'textarea', placeholder: 'Physical characteristics, lifespan, abilities, weaknesses' },
+                    { name: 'culture', label: 'Culture', type: 'textarea', placeholder: 'Society, beliefs, customs, social structure' },
+                    { name: 'history', label: 'History', type: 'textarea', placeholder: 'Origins, major events in their history', large: true },
+                    { name: 'description', label: 'Additional Notes', type: 'textarea', placeholder: 'Any other details about this species' }
+                ]
+            },
+            character: {
+                fields: [
+                    { name: 'species', label: 'Species', type: 'text', placeholder: 'What species are they? (will auto-link)' },
+                    { name: 'affiliation', label: 'Affiliation', type: 'text', placeholder: 'Faction, organization, or allegiance' },
+                    { name: 'background', label: 'Background', type: 'textarea', placeholder: 'Origin, upbringing, how they got where they are' },
+                    { name: 'personality', label: 'Personality', type: 'textarea', placeholder: 'Traits, motivations, fears, goals' },
+                    { name: 'description', label: 'Additional Notes', type: 'textarea', placeholder: 'Appearance, abilities, other details' }
+                ]
+            },
+            location: {
+                fields: [
+                    { name: 'planet', label: 'Planet/Region', type: 'text', placeholder: 'Where is this located? (will auto-link)' },
+                    { name: 'geography', label: 'Geography', type: 'textarea', placeholder: 'Physical layout, terrain, notable features' },
+                    { name: 'significance', label: 'Significance', type: 'textarea', placeholder: 'Why does this place matter? Historical or strategic importance' },
+                    { name: 'description', label: 'Additional Notes', type: 'textarea', placeholder: 'Any other details about this location' }
+                ]
+            },
+            faction: {
+                fields: [
+                    { name: 'headquarters', label: 'Headquarters', type: 'text', placeholder: 'Where are they based? (will auto-link)' },
+                    { name: 'ideology', label: 'Ideology/Goals', type: 'textarea', placeholder: 'What do they believe? What are they trying to achieve?' },
+                    { name: 'members', label: 'Notable Members', type: 'textarea', placeholder: 'Key characters in this faction (will auto-link)' },
+                    { name: 'history', label: 'History', type: 'textarea', placeholder: 'How they formed, major events' },
+                    { name: 'description', label: 'Additional Notes', type: 'textarea', placeholder: 'Any other details about this faction' }
+                ]
+            },
+            event: {
+                fields: [
+                    { name: 'date', label: 'When', type: 'text', placeholder: 'When did this happen? (your world\'s calendar)' },
+                    { name: 'location', label: 'Where', type: 'text', placeholder: 'Where did it happen? (will auto-link)' },
+                    { name: 'participants', label: 'Who was involved', type: 'textarea', placeholder: 'Characters, factions, species involved (will auto-link)' },
+                    { name: 'outcome', label: 'Outcome', type: 'textarea', placeholder: 'What happened? What changed as a result?' },
+                    { name: 'description', label: 'Full Description', type: 'textarea', placeholder: 'Detailed account of the event', large: true }
+                ]
+            },
+            artifact: {
+                fields: [
+                    { name: 'origin', label: 'Origin', type: 'text', placeholder: 'Where does it come from? Who made it?' },
+                    { name: 'powers', label: 'Powers/Properties', type: 'textarea', placeholder: 'What does it do? What makes it special?' },
+                    { name: 'currentLocation', label: 'Current Location', type: 'text', placeholder: 'Where is it now? Who has it?' },
+                    { name: 'history', label: 'History', type: 'textarea', placeholder: 'Its journey through time, who has possessed it' },
+                    { name: 'description', label: 'Additional Notes', type: 'textarea', placeholder: 'Appearance, lore, other details' }
+                ]
+            },
+            concept: {
+                fields: [
+                    { name: 'definition', label: 'Definition', type: 'textarea', placeholder: 'What is this concept? How does it work?' },
+                    { name: 'examples', label: 'Examples', type: 'textarea', placeholder: 'How does this manifest in your world?' },
+                    { name: 'description', label: 'Additional Notes', type: 'textarea', placeholder: 'Any other details about this concept' }
+                ]
+            }
+        };
 
         function getEntries() {
             const data = localStorage.getItem(STORAGE_KEY);
@@ -130,27 +227,144 @@
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
         }
 
-        function slugify(text) {
-            return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        function getEntryNames() {
+            return getEntries().map(e => e.name.toLowerCase());
         }
 
         function autoLink(text, entries, currentId) {
+            if (!text) return '';
             let html = text.replace(/\n/g, '</p><p>');
             html = '<p>' + html + '</p>';
 
             entries.forEach(entry => {
                 if (entry.id === currentId) return;
-                const pattern = new RegExp(`\\b${entry.name}\\b`, 'g');
-                html = html.replace(pattern, `<a href="#" onclick="viewEntry('${entry.id}'); return false;">${entry.name}</a>`);
+                const escapedName = entry.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const pattern = new RegExp(`\\b(${escapedName})\\b`, 'gi');
+                html = html.replace(pattern, `<a href="#" class="auto-link" onclick="viewEntry('${entry.id}'); return false;">$1</a>`);
             });
 
             return html;
+        }
+
+        // Check for inconsistencies/warnings
+        function checkInconsistencies() {
+            const entries = getEntries();
+            const warnings = [];
+            const entryNames = entries.map(e => e.name.toLowerCase());
+            const entryById = {};
+            entries.forEach(e => entryById[e.id] = e);
+
+            entries.forEach(entry => {
+                // Check species homeworld references
+                if (entry.type === 'species' && entry.homeworld) {
+                    if (!entryNames.includes(entry.homeworld.toLowerCase())) {
+                        warnings.push({
+                            entry: entry,
+                            type: 'missing_reference',
+                            message: `Species "${entry.name}" references homeworld "${entry.homeworld}" which doesn't exist`
+                        });
+                    }
+                }
+
+                // Check character species references
+                if (entry.type === 'character' && entry.species) {
+                    if (!entryNames.includes(entry.species.toLowerCase())) {
+                        warnings.push({
+                            entry: entry,
+                            type: 'missing_reference',
+                            message: `Character "${entry.name}" is a "${entry.species}" but that species doesn't exist`
+                        });
+                    }
+                }
+
+                // Check location planet references
+                if (entry.type === 'location' && entry.planet) {
+                    if (!entryNames.includes(entry.planet.toLowerCase())) {
+                        warnings.push({
+                            entry: entry,
+                            type: 'missing_reference',
+                            message: `Location "${entry.name}" is on "${entry.planet}" but that planet doesn't exist`
+                        });
+                    }
+                }
+
+                // Check faction headquarters
+                if (entry.type === 'faction' && entry.headquarters) {
+                    if (!entryNames.includes(entry.headquarters.toLowerCase())) {
+                        warnings.push({
+                            entry: entry,
+                            type: 'missing_reference',
+                            message: `Faction "${entry.name}" is based at "${entry.headquarters}" which doesn't exist`
+                        });
+                    }
+                }
+
+                // Check event location
+                if (entry.type === 'event' && entry.location) {
+                    if (!entryNames.includes(entry.location.toLowerCase())) {
+                        warnings.push({
+                            entry: entry,
+                            type: 'missing_reference',
+                            message: `Event "${entry.name}" happened at "${entry.location}" which doesn't exist`
+                        });
+                    }
+                }
+            });
+
+            return warnings;
+        }
+
+        function renderWarnings() {
+            const warnings = checkInconsistencies();
+            const warningsEl = document.getElementById('warnings');
+
+            if (warnings.length === 0) {
+                warningsEl.innerHTML = '';
+                return;
+            }
+
+            let html = '<div class="warnings"><h3>⚠️ Inconsistencies Found</h3><ul>';
+            warnings.forEach(w => {
+                html += `<li>${w.message} <a href="#" class="warning-link" onclick="viewEntry('${w.entry.id}'); return false;">[Edit]</a></li>`;
+            });
+            html += '</ul></div>';
+            warningsEl.innerHTML = html;
+        }
+
+        function updateFormFields() {
+            const type = document.getElementById('type').value;
+            const container = document.getElementById('type-fields');
+
+            if (!type || !TYPE_TEMPLATES[type]) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const template = TYPE_TEMPLATES[type];
+            let html = '<div class="field-section"><h3>' + type.charAt(0).toUpperCase() + type.slice(1) + ' Details</h3>';
+
+            template.fields.forEach(field => {
+                html += `<div class="form-group">
+                    <label>${field.label}</label>`;
+
+                if (field.type === 'textarea') {
+                    html += `<textarea id="field_${field.name}" class="${field.large ? 'large' : ''}" placeholder="${field.placeholder || ''}"></textarea>`;
+                } else {
+                    html += `<input type="${field.type}" id="field_${field.name}" placeholder="${field.placeholder || ''}">`;
+                }
+                html += '</div>';
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
         }
 
         function render() {
             const entries = getEntries();
             const listEl = document.getElementById('entries-list');
             const statsEl = document.getElementById('stats');
+
+            renderWarnings();
 
             if (entries.length === 0) {
                 listEl.innerHTML = '<div class="empty-state">No entries yet. Click "Create Entry" to start building your world!</div>';
@@ -165,10 +379,17 @@
                 byType[e.type].push(e);
             });
 
+            const typeOrder = ['planet', 'species', 'character', 'location', 'faction', 'event', 'artifact', 'concept'];
+            const typeEmoji = {
+                planet: '🪐', species: '👽', character: '👤', location: '📍',
+                faction: '⚔️', event: '📅', artifact: '🔮', concept: '💡'
+            };
+
             let html = '';
-            Object.keys(byType).sort().forEach(type => {
+            typeOrder.forEach(type => {
+                if (!byType[type]) return;
                 const items = byType[type].sort((a, b) => a.name.localeCompare(b.name));
-                html += `<h2>${type.charAt(0).toUpperCase() + type.slice(1)}s</h2>`;
+                html += `<h2>${typeEmoji[type] || ''} ${type.charAt(0).toUpperCase() + type.slice(1)}s</h2>`;
                 html += '<ul class="entry-list">';
                 items.forEach(entry => {
                     html += `
@@ -188,7 +409,9 @@
             });
 
             listEl.innerHTML = html;
-            statsEl.textContent = `${entries.length} entries`;
+
+            const typeCounts = Object.keys(byType).map(t => `${byType[t].length} ${t}${byType[t].length > 1 ? 's' : ''}`).join(', ');
+            statsEl.textContent = `${entries.length} entries: ${typeCounts}`;
         }
 
         function showIndex() {
@@ -206,18 +429,48 @@
             document.getElementById('entry-view').classList.add('active');
             document.getElementById('entry-title').textContent = entry.name;
 
-            let meta = `<span>${entry.type}</span>`;
+            const typeEmoji = {
+                planet: '🪐', species: '👽', character: '👤', location: '📍',
+                faction: '⚔️', event: '📅', artifact: '🔮', concept: '💡'
+            };
+
+            let meta = `<span>${typeEmoji[entry.type] || ''} ${entry.type}</span>`;
             if (entry.tags) {
                 entry.tags.forEach(t => meta += `<span>#${t}</span>`);
             }
             document.getElementById('entry-meta').innerHTML = meta;
-            document.getElementById('entry-content').innerHTML = autoLink(entry.description, entries, id);
+
+            // Render type-specific fields
+            let content = '';
+            const template = TYPE_TEMPLATES[entry.type];
+            if (template) {
+                template.fields.forEach(field => {
+                    const value = entry[field.name];
+                    if (value) {
+                        content += `<div class="field">
+                            <div class="field-label">${field.label}</div>
+                            <div class="field-value">${autoLink(value, entries, id)}</div>
+                        </div>`;
+                    }
+                });
+            }
+
+            // Fallback for old entries with just description
+            if (!content && entry.description) {
+                content = autoLink(entry.description, entries, id);
+            }
+
+            document.getElementById('entry-content').innerHTML = content +
+                `<div style="margin-top: 2rem; text-align: right;">
+                    <button class="btn" onclick="editEntry('${id}')">Edit Entry</button>
+                </div>`;
         }
 
         function openCreate() {
             document.getElementById('modal-title').textContent = 'Create Entry';
             document.getElementById('entry-form').reset();
             document.getElementById('entry-id').value = '';
+            document.getElementById('type-fields').innerHTML = '';
             document.getElementById('modal').classList.add('active');
         }
 
@@ -235,7 +488,22 @@
             document.getElementById('name').value = entry.name;
             document.getElementById('type').value = entry.type;
             document.getElementById('tags').value = entry.tags ? entry.tags.join(', ') : '';
-            document.getElementById('description').value = entry.description;
+
+            updateFormFields();
+
+            // Fill in type-specific fields
+            const template = TYPE_TEMPLATES[entry.type];
+            if (template) {
+                setTimeout(() => {
+                    template.fields.forEach(field => {
+                        const el = document.getElementById('field_' + field.name);
+                        if (el && entry[field.name]) {
+                            el.value = entry[field.name];
+                        }
+                    });
+                }, 10);
+            }
+
             document.getElementById('modal').classList.add('active');
         }
 
@@ -254,9 +522,20 @@
             const name = document.getElementById('name').value.trim();
             const type = document.getElementById('type').value;
             const tagsStr = document.getElementById('tags').value.trim();
-            const description = document.getElementById('description').value.trim();
 
             const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
+
+            // Gather type-specific fields
+            const extraFields = {};
+            const template = TYPE_TEMPLATES[type];
+            if (template) {
+                template.fields.forEach(field => {
+                    const el = document.getElementById('field_' + field.name);
+                    if (el) {
+                        extraFields[field.name] = el.value.trim();
+                    }
+                });
+            }
 
             let entries = getEntries();
 
@@ -264,7 +543,14 @@
                 // Edit
                 const idx = entries.findIndex(e => e.id === id);
                 if (idx !== -1) {
-                    entries[idx] = { ...entries[idx], name, type, tags, description, updated: new Date().toISOString() };
+                    entries[idx] = {
+                        ...entries[idx],
+                        name,
+                        type,
+                        tags,
+                        ...extraFields,
+                        updated: new Date().toISOString()
+                    };
                 }
             } else {
                 // Create
@@ -273,14 +559,14 @@
                     name,
                     type,
                     tags,
-                    description,
+                    ...extraFields,
                     created: new Date().toISOString()
                 });
             }
 
             saveEntries(entries);
             closeModal();
-            render();
+            showIndex();
         });
 
         // Close modal on outside click
