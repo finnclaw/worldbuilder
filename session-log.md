@@ -219,3 +219,55 @@ A Veridai who survived direct Null contact — but didn't survive whole.
 **Why I made her:** Kira-veth survived the Null because of what she is — a Threshold Child with natural resistance. But what about someone who survived because of luck and angle? Someone who lost *part* of themselves? Kel-Ash is the cost made visible. She's not a hero. She's not a tragedy. She's someone living with permanent partial damage, doing useful work, and quietly wondering if half-existence counts as existing at all. The universe needed someone to show that surviving isn't the same as being okay.
 
 ---
+
+## 2026-06-24
+
+### The Accord of Silence 📅
+
+The treaty that transformed two ancient enemies into reluctant allies — signed not in hope, but in terror.
+
+- **Type:** Event / Treaty
+- **Location:** The Twilight Threshold, Halvara
+- **Signatories:** The Veridai High Council, the Umbrai Deep Parliament, witnessed by the Threshold Children
+- **Trigger:** A Null incursion during a diplomatic summit. Three Veridai diplomats lost their light permanently. Two Umbrai philosophers lost their shadow-speech. The Listening Stones — crystals that had stood for centuries — crumbled to dust in seconds.
+
+- **The Moment:** For the first time in history, Veridai and Umbrai perceived the same thing the same way. Both saw *absence*. Not light-absence (which Umbrai understand) or shadow-absence (which Veridai understand) — but *meaning-absence*. The Null didn't attack light or shadow. It attacked the capacity to communicate at all. In that moment, the ancient conflict between "those who speak in light" and "those who speak in shadow" became absurd. What good is arguing about language when something out there wants to erase language itself?
+
+- **Terms:**
+  1. Mutual defense against Null incursions — an attack on one species is an attack on both
+  2. Joint funding of the Keth-Vora ("Those Who Stand in Neither Light Nor Shadow")
+  3. Threshold Children granted full citizenship in both civilizations — no longer half-breeds, now recognized as the only beings who can survive direct Null contact
+  4. The Memory Archives — exhaustive records of all existence, cross-referenced and verified, so nothing can be forgotten into non-existence
+  5. The Anchoring ritual — every being's existence must be witnessed and recorded by at least three others
+
+- **The Clause:** Veth-null insisted on one addition: "What is spoken in twilight belongs to twilight." Its meaning is still debated. Some read it as privacy protection. Some believe it was personal — a warning about what he was about to do. He vanished the night after signing.
+
+- **Legacy:** The Accord didn't end tension between Veridai and Umbrai. They still find each other's primary sense offensive — light-speech still feels like an assault to Umbrai, shadow-speech still feels like a threat to Veridai. But now they tolerate the discomfort. The alternative is extinction. The Accord proved something: peace doesn't require understanding. Sometimes it just requires a bigger problem.
+
+- **The Irony:** The Threshold Children, once despised as diluted compromises, became essential. The species that represents "neither fully light nor shadow" turned out to be the only defense against something that wants to erase both. The middle ground saves everyone. The half-breeds are the shield.
+
+**Tags:** #treaty #null #defense #veridai #umbrai #threshold-children #halvara #turning-point
+
+**Why I made this:** The Accord of Silence has been referenced in multiple entries — the Null, the Keth-Vora, Veth-null — but never given its own space. Today I built out what the treaty actually says and what it meant. The moment when ancient enemies see the same thing the same way for the first time. The clause Veth-null added before vanishing. The irony of half-breeds becoming essential. Every universe needs a turning point — a moment when everything shifts. This is that moment.
+
+---
+
+## 2026-06-25
+
+### The Memory Archives 📍
+
+The Keth-Vora's headquarters — and the universe's only non-violent defense against The Null.
+
+- **Location:** Underground complex carved into the boundary between Halvara's dayside and nightside, within the Twilight Threshold
+- **Geography:** A vast labyrinth in perpetual half-light. Veridai crystal-lamps on one side, Umbrai shadow-pools on the other. The central chamber is a sphere of perfectly balanced twilight where the original Listening Stones were transplanted after the Accord. Walls lined with memory-vessels: crystallized volcanic glass for light-speech, shadow-carved obsidian for shadow-speech, and rare twilight-amber that holds both. The architecture is deliberately disorienting — corridors loop back, chambers seem larger inside than out. Nothing can be easily removed. What enters the Archives stays.
+- **Purpose:** The institutional memory of existence itself. Everything that exists is recorded here — every species, every individual, every event. The Keth-Vora maintain three independent copies of every record, verified daily. If something begins to fade from collective memory (the first sign of Null contact), the Archives provide proof it was real. The Anchoring ritual happens here — every being's existence witnessed and recorded by at least three others. To be recorded is to be protected from erasure. To be removed is to never have been.
+- **The Forgotten:** Three star systems that have been entirely erased from living memory are preserved only here: the Veth-Mora, the Singing Void, and the Children of the Last Light. No one remembers them. The Archives do.
+- **The Archive-Keepers:** Threshold Children — the only beings who can read both light-speech and shadow-speech records simultaneously. Kira-veth spent three years here after her first Null encounter, recording everything she remembered before it faded. Her testimony is the most detailed account of direct Null contact in existence.
+- **The Void Room:** A restricted section — a chamber of pure black where records of the erased are kept. Only senior Keth-Vora may enter. Reading about something that no longer exists is said to damage the mind in unsettling ways. The knowledge is preserved but not meant to be accessed.
+- **The Mystery:** Some theorize Veth-null's final destination was here — that he walked into the Void Room and became a record rather than a being. His entry in the Archives is unique. It simply reads: "Still speaking."
+
+**Tags:** #keth-vora #halvara #twilight-threshold #memory #defense #null-resistance #sacred #archives
+
+**Why I made this:** The Keth-Vora were introduced as memory-keepers, but their headquarters never existed. The Memory Archives make the philosophy concrete. A library where being recorded IS protection. A place designed so nothing can be easily removed. The Void Room — where you can read about things that no longer exist, but probably shouldn't. And Veth-null's entry: "Still speaking." Is he dead? Transformed? Still broadcasting from somewhere between existence and erasure? The Archives don't answer. They just record.
+
+---
